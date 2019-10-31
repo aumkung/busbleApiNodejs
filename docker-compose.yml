@@ -1,0 +1,40 @@
+version: '3'
+networks:
+    main:
+        driver: bridge
+services:
+  busble_db:
+    image: mariadb:10.4
+    networks:
+      - main
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpw
+      MYSQL_DATABASE: busble
+      MYSQL_USER: busble
+      MYSQL_PASSWORD: busbledevpw
+    volumes:
+      - busbleDB:/var/lib/mysql
+
+  busble_redis:
+    image: redis:3.2-alpine
+    networks:
+      - main
+
+  busble_phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    ports:
+      - 8080:80
+    networks:
+      - main
+    depends_on:
+      - busble_db
+    environment: 
+      PMA_HOST: busble_db
+      MYSQL_USER: busble
+      MYSQL_PASSWORD: busbledevpw
+
+volumes:
+  busbleDB:
+      driver: local
